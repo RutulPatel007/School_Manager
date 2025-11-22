@@ -5,7 +5,6 @@ import com.schoolmanagement.models.Book;
 import org.junit.jupiter.api.*;
 
 import java.sql.*;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,146 +15,155 @@ public class BookDAOTest {
 
     @BeforeAll
     static void setupDatabase() throws SQLException {
-        // Establish the database connection
         connection = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
             "root",
             "admin"
         );
-        
         bookDAO = new BookDAO(connection);
-        Statement st = connection.createStatement();
-        st.execute("INSERT IGNORE INTO libraries (id, name) VALUES (1, 'Main Library')");
-    st.execute("INSERT IGNORE INTO teachers (id, emp_id, name, dob, address, salary) " +
-               "VALUES (1, 'T001', 'Teacher One', '1980-01-01', 'XYZ', 50000)");
-    st.execute("INSERT IGNORE INTO courses (course_id, course_code, course_name, course_description) " +
-               "VALUES (1, 'C001', 'Algorithms', 'Test Course')");
+
+        // Ensure supporting rows exist
+        try (Statement st = connection.createStatement()) {
+            st.execute("INSERT IGNORE INTO libraries (id, name) VALUES (1, 'Main Library')");
+            st.execute("INSERT IGNORE INTO courses (course_id, course_code, course_name, course_description) VALUES (1, 'C001', 'Algorithms', 'Test Course')");
+        }
     }
 
     @AfterAll
-    static void closeDatabase() throws SQLException {
-        // Close database connection
-        if (connection != null) {
-            connection.close();
-        }
+    static void tearDown() throws SQLException {
+        if (connection != null) connection.close();
     }
 
     @BeforeEach
-    void setupTestData() throws SQLException {
-        // Insert test data before each test
-        String query = "INSERT INTO books (id, book_id, title, author, library_id) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 1);
-            ps.setString(2, "B101");
-            ps.setString(3, "Introduction to Algorithms");
-            ps.setString(4, "Thomas H. Cormen");
-            ps.setInt(5, 1);  // Assuming library_id is 1
-            ps.executeUpdate();
-        }
-    }
-
-    @AfterEach
-    void cleanupTestData() throws SQLException {
-        // Clean up test data after each test
-        String query = "DELETE FROM books WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 1);
-            ps.executeUpdate();
+    void cleanTablesBefore() throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM course_books");
+            st.execute("DELETE FROM books");
         }
     }
 
     @Test
-    void testCreate() throws SQLException {
-        Book book = new Book(2, "B102", "Data Structures", "Alfred V. Aho", 1);
-        bookDAO.create(book);
+    void testCreateAndReadAndDelete() throws SQLException {
+        // create
+        Book b = new Book(10, "B10", "Test Title", "Author X", 1);
+        bookDAO.create(b);
 
-        Book retrieved = bookDAO.read(2);
-        assertNotNull(retrieved);
-        assertEquals("Data Structures", retrieved.getTitle());
-        assertEquals("Alfred V. Aho", retrieved.getAuthor());
+        // verify created by reading back
+        Book read = bookDAO.read(10);
+        assertNotNull(read);
+        assertEquals("Test Title", read.getTitle());
 
-        // Clean up
-        bookDAO.delete(2);
+        // delete and verify removed
+        bookDAO.delete(10);
+        assertNull(bookDAO.read(10));
     }
 
     @Test
-    void testRead() throws SQLException {
-        Book book = bookDAO.read(1);
-        assertNotNull(book);
-        assertEquals("Introduction to Algorithms", book.getTitle());
-    }
-
-    @Test
-    void testUpdate() throws SQLException {
-        Book book = bookDAO.read(1);
-        assertNotNull(book);
-
-        // Update book title
-        book.setTitle("Algorithms - Revised Edition");
-        bookDAO.update("Algorithms - Revised Edition", "B101", "Thomas H. Cormen");
-
-        Book updatedBook = bookDAO.read(1);
-        assertEquals("Algorithms - Revised Edition", updatedBook.getTitle());
-    }
-
-    @Test
-    void testDelete() throws SQLException {
-        // Insert a new book to delete
-        String query = "INSERT INTO books (id, book_id, title, author, library_id) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 3);
-            ps.setString(2, "B103");
-            ps.setString(3, "Operating Systems Concepts");
-            ps.setString(4, "Abraham Silberschatz");
+    void testUpdateChangesRow() throws SQLException {
+        // insert
+        try (PreparedStatement ps = connection.prepareStatement(
+            "INSERT INTO books (id, book_id, title, author, library_id) VALUES (?,?, ?, ?, ?)")) {
+            ps.setInt(1, 11);
+            ps.setString(2, "B11");
+            ps.setString(3, "Old Title");
+            ps.setString(4, "A");
             ps.setInt(5, 1);
             ps.executeUpdate();
         }
 
-        bookDAO.delete(3);
+        // update via DAO
+        bookDAO.update("New Title", "B11", "A");
 
-        Book book = bookDAO.read(3);
-        assertNull(book);
+        // verify update persisted
+        Book updated = bookDAO.read(11);
+        assertNotNull(updated);
+        assertEquals("New Title", updated.getTitle());
+
+        // cleanup
+        bookDAO.delete(11);
     }
 
     @Test
-    void testMarkBookWithCourse() throws SQLException {
-        bookDAO.markBookWithCourse(1, 1);  // Assuming course_id is 1
+    void testMarkAndUnmarkBookWithCourse_affectsDB() throws SQLException {
+        // Ensure course exists
+        try (Statement st = connection.createStatement()) {
+            st.execute("INSERT IGNORE INTO courses (course_id, course_code, course_name, course_description) " +
+                    "VALUES (1, 'C001', 'Algorithms', 'Test Course')");
+        }
 
-        // Verify the book is marked with the course
-        String query = "SELECT * FROM course_books WHERE course_id = ? AND book_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        // insert book
+        try (PreparedStatement ps = connection.prepareStatement(
+            "INSERT INTO books (id, book_id, title, author, library_id) VALUES (?,?, ?, ?, ?)")) {
+            ps.setInt(1, 12);
+            ps.setString(2, "B12");
+            ps.setString(3, "Course Book");
+            ps.setString(4, "A");
+            ps.setInt(5, 1);
+            ps.executeUpdate();
+        }
+
+        // mark book with course
+        bookDAO.markBookWithCourse(12, 1);
+
+        // verify the association exists
+        try (PreparedStatement check = connection.prepareStatement(
+            "SELECT * FROM course_books WHERE course_id = ? AND book_id = ?")) {
+            check.setInt(1, 1);
+            check.setInt(2, 12);
+            try (ResultSet rs = check.executeQuery()) {
+                assertTrue(rs.next(), "Association should be created");
+            }
+        }
+
+        // unmark the association
+        bookDAO.unmarkBookWithCourse(12, 1);
+
+        // verify it's removed
+        try (PreparedStatement check = connection.prepareStatement(
+            "SELECT * FROM course_books WHERE course_id = ? AND book_id = ?")) {
+            check.setInt(1, 1);
+            check.setInt(2, 12);
+            try (ResultSet rs = check.executeQuery()) {
+                assertFalse(rs.next(), "Association should be removed");
+            }
+        }
+
+        // cleanup
+        bookDAO.delete(12);
+    }
+
+    @Test
+    void testGetBooksForCourse_returnsList() throws SQLException {
+        // create book and map to course
+        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO books (id, book_id, title, author, library_id) VALUES (?,?,?,?,?)")) {
+            ps.setInt(1, 20);
+            ps.setString(2, "B20");
+            ps.setString(3, "CourseLinked");
+            ps.setString(4, "X");
+            ps.setInt(5, 1);
+            ps.executeUpdate();
+        }
+        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO course_books (course_id, book_id) VALUES (?, ?)")) {
             ps.setInt(1, 1);
-            ps.setInt(2, 1);
-            ResultSet rs = ps.executeQuery();
-            assertTrue(rs.next(), "The book should be associated with the course.");
+            ps.setInt(2, 20);
+            ps.executeUpdate();
+        }
+
+        var list = bookDAO.getBooksForCourse(1);
+        assertNotNull(list);
+        assertTrue(list.size() >= 1);
+
+        // cleanup
+        bookDAO.delete(20);
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM course_books WHERE course_id = ? AND book_id = ?")) {
+            ps.setInt(1, 1);
+            ps.setInt(2, 20);
+            ps.executeUpdate();
         }
     }
 
     @Test
-    void testUnmarkBookWithCourse() throws SQLException {
-        // Mark the book first
-        bookDAO.markBookWithCourse(1, 1);
-
-        // Unmark the book from the course
-        bookDAO.unmarkBookWithCourse(1, 1);
-
-        // Verify the book is no longer associated with the course
-        String query = "SELECT * FROM course_books WHERE course_id = ? AND book_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 1);
-            ps.setInt(2, 1);
-            ResultSet rs = ps.executeQuery();
-            assertFalse(rs.next(), "The book should no longer be associated with the course.");
-        }
-    }
-
-    @Test
-    void testGetBooksForCourse() throws SQLException {
-        // Mark a book with a course first
-        bookDAO.markBookWithCourse(1, 1);
-
-        List<Book> books = bookDAO.getBooksForCourse(1);
-        assertNotNull(books);
-        assertTrue(books.size() > 0, "There should be at least one book associated with the course.");
+    void testReadNonExistent_returnsNull() throws SQLException {
+        assertNull(bookDAO.read(-9999));
     }
 }

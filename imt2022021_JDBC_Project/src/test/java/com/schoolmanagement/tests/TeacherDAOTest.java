@@ -15,110 +15,106 @@ public class TeacherDAOTest {
     private static TeacherDAO teacherDAO;
 
     @BeforeAll
-    static void setupDatabase() throws SQLException {
-        // Establish the database connection
+    static void setupAll() throws SQLException {
         connection = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
             "root",
             "admin"
         );
-        
         teacherDAO = new TeacherDAO(connection);
     }
 
     @AfterAll
-    static void closeDatabase() throws SQLException {
-        // Close database connection
-        if (connection != null) {
-            connection.close();
-        }
+    static void tearAll() throws SQLException {
+        if (connection != null) connection.close();
     }
 
     @BeforeEach
-    void setupTestData() throws SQLException {
-        // Insert test data before each test
-        String query = "INSERT INTO teachers (id, emp_id, name, dob, address, salary) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 2);
-            ps.setString(2, "T1234");
-            ps.setString(3, "John Doe");
-            ps.setString(4, "1985-03-12");
-            ps.setString(5, "789 Oak Street");
-            ps.setFloat(6, 50000f);
-            ps.executeUpdate();
-        }
-    }
-
-    @AfterEach
-    void cleanupTestData() throws SQLException {
-        // Clean up test data after each test
-        String query = "DELETE FROM teachers WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 2);
-            ps.executeUpdate();
+    void cleanBefore() throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM teachers");
         }
     }
 
     @Test
-    void testCreate() throws SQLException {
-        Teacher teacher = new Teacher(3, "T5678", "Jane Smith", "1990-07-25", "123 Pine Street", 60000f);
-        teacherDAO.create(teacher);
+    void testCreateReadDeleteCycle() throws SQLException {
+        Teacher t = new Teacher(601, "E601", "Teach", "1970-01-01", "Addr", 45000f);
+        teacherDAO.create(t);
 
-        Teacher retrieved = teacherDAO.read(3);
-        assertNotNull(retrieved);
-        assertEquals("Jane Smith", retrieved.getName());
-        assertEquals(60000f, retrieved.getSalary(), 0.01f);
+        Teacher read = teacherDAO.read(601);
+        assertNotNull(read);
+        assertEquals("Teach", read.getName());
 
-        // Clean up
-        teacherDAO.delete(3);
+        teacherDAO.delete(601);
+        assertNull(teacherDAO.read(601));
     }
 
     @Test
-    void testRead() throws SQLException {
-        Teacher teacher = teacherDAO.read(2);
-        assertNotNull(teacher);
-        assertEquals("John Doe", teacher.getName());
+    void testUpdateAddress_andPersisted() throws SQLException {
+        teacherDAO.create(new Teacher(602, "E602", "Upd", "1971-02-02", "Old", 50000f));
+        teacherDAO.update("NewAddr", "E602");
+
+        Teacher after = teacherDAO.read(602);
+        assertNotNull(after);
+        assertEquals("NewAddr", after.getAddress());
+
+        teacherDAO.delete(602);
     }
 
     @Test
-    void testUpdate() throws SQLException {
-        Teacher teacher = teacherDAO.read(2);
-        assertNotNull(teacher);
+    void testIncrementSalary_mutatesValue() throws SQLException {
+        teacherDAO.create(new Teacher(603, "E603", "Sal", "1972-03-03", "Addr", 50000f));
 
-        teacher.setAddress("Brompton 107");;
-        teacherDAO.update(teacher.getAddress(), teacher.getEmpId());
+        // read before
+        Teacher before = teacherDAO.read(603);
+        assertNotNull(before);
+        float old = before.getSalary();
 
-        Teacher updatedTeacher = teacherDAO.read(2);
-        assertEquals("Brompton 107", updatedTeacher.getAddress(),"Address should be updated to Brompton 107");
+        teacherDAO.incrementSalary(603, 2000f);
+
+        Teacher after = teacherDAO.read(603);
+        assertNotNull(after);
+        assertEquals(old + 2000f, after.getSalary(), 0.001);
+
+        teacherDAO.delete(603);
     }
 
     @Test
-    void testDelete() throws SQLException {
-        teacherDAO.delete(2);
+    void testGetHighestPaidTeacher_andEmptyCase() throws SQLException {
+        // empty -> null
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM teachers");
+        }
+        assertNull(teacherDAO.getHighestPaidTeacher());
 
-        Teacher teacher = teacherDAO.read(2);
-        assertNull(teacher);
+        // create two teachers
+        teacherDAO.create(new Teacher(604, "E604", "High", "1973-04-04", "A", 70000f));
+        teacherDAO.create(new Teacher(605, "E605", "Low", "1974-05-05", "B", 40000f));
+
+        Teacher highest = teacherDAO.getHighestPaidTeacher();
+        assertNotNull(highest);
+        assertEquals("High", highest.getName());
+
+        teacherDAO.delete(604);
+        teacherDAO.delete(605);
     }
 
     @Test
-    void testIncrementSalary() throws SQLException {
-        teacherDAO.incrementSalary(2, 1000f);
+    void testMapResultSetToList_emptyAndWithData() throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM teachers");
+        }
 
-        Teacher teacher = teacherDAO.read(2);
-        assertEquals(51000f, teacher.getSalary(), 0.01f);
-    }
+        List<Teacher> empty = teacherDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM teachers"));
+        assertNotNull(empty);
+        assertEquals(0, empty.size());
 
-    @Test
-    void testGetHighestPaidTeacher() throws SQLException {
-        Teacher highestPaid = teacherDAO.getHighestPaidTeacher();
-        assertNotNull(highestPaid);
-        assertTrue(highestPaid.getSalary() >= 50000f); // Assumes the test data has a teacher with salary >= 50000
-    }
+        // insert one
+        teacherDAO.create(new Teacher(606, "E606", "One", "1975-06-06", "C", 48000f));
+        List<Teacher> some = teacherDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM teachers"));
+        assertNotNull(some);
+        assertTrue(some.size() >= 1);
 
-    @Test
-    void testMapResultSetToList() throws SQLException {
-        List<Teacher> teachers = teacherDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM teachers"));
-        assertNotNull(teachers);
-        assertTrue(teachers.size() > 0, "There should be at least one teacher in the database.");
+        teacherDAO.delete(606);
     }
 }

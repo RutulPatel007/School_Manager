@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.schoolmanagement.tests.TeacherDAOTest" time="0.026" tests="7" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.schoolmanagement.tests.TeacherDAOTest" time="0.028" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="25"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -13,7 +13,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251122223219408_3.jar /Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire 2025-11-22T22-32-19_362-jvmRun1 surefire-20251122223219408_1tmp surefire_0-20251122223219408_2tmp"/>
+    <property name="sun.java.command" value="/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251122230308501_3.jar /Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire 2025-11-22T23-03-08_466-jvmRun1 surefire-20251122230308501_1tmp surefire_0-20251122230308501_2tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/test-classes:/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/classes:/Users/rutul/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/Users/rutul/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/Users/rutul/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/Users/rutul/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:"/>
@@ -30,7 +30,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251122223219408_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251122230308501_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.runtime.version" value="25"/>
@@ -60,11 +60,9 @@
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.class.version" value="69.0"/>
   </properties>
-  <testcase name="testGetHighestPaidTeacher" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.002"/>
-  <testcase name="testRead" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.002"/>
-  <testcase name="testIncrementSalary" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.008"/>
-  <testcase name="testMapResultSetToList" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.001"/>
-  <testcase name="testCreate" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.003"/>
-  <testcase name="testDelete" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.002"/>
-  <testcase name="testUpdate" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.002"/>
+  <testcase name="testCreateReadDeleteCycle" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.004"/>
+  <testcase name="testMapResultSetToList_emptyAndWithData" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.003"/>
+  <testcase name="testUpdateAddress_andPersisted" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.003"/>
+  <testcase name="testIncrementSalary_mutatesValue" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.005"/>
+  <testcase name="testGetHighestPaidTeacher_andEmptyCase" classname="com.schoolmanagement.tests.TeacherDAOTest" time="0.007"/>
 </testsuite>

@@ -15,106 +15,82 @@ public class CourseDAOTest {
     private static CourseDAO courseDAO;
 
     @BeforeAll
-    static void setupDatabase() throws SQLException {
-        // Establish the database connection
+    static void setup() throws SQLException {
         connection = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
             "root",
             "admin"
         );
-        
         courseDAO = new CourseDAO(connection);
     }
 
     @AfterAll
-    static void closeDatabase() throws SQLException {
-        // Close database connection
-        if (connection != null) {
-            connection.close();
-        }
+    static void tearDown() throws SQLException {
+        if (connection != null) connection.close();
     }
 
     @BeforeEach
-    void setupTestData() throws SQLException {
-        // Insert test data before each test
-        String query = "INSERT INTO courses (course_id, course_code, course_name, course_description) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 101);
-            ps.setString(2, "CS101");
-            ps.setString(3, "Introduction to Computer Science");
-            ps.setString(4, "An introductory course on computer science.");
-            ps.executeUpdate();
-        }
-    }
-
-    @AfterEach
-    void cleanupTestData() throws SQLException {
-        // Clean up test data after each test
-        String query = "DELETE FROM courses WHERE course_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 101);
-            ps.executeUpdate();
+    void clean() throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM course_books");
+            st.execute("DELETE FROM courses");
         }
     }
 
     @Test
-    void testCreate() throws SQLException {
-        Course course = new Course(102, "CS102", "Data Structures", "An advanced course on data structures.");
-        courseDAO.create(course);
+    void testCreateReadDeleteCycle() throws SQLException {
+        Course c = new Course(201, "CS201", "OS", "Operating Systems");
+        courseDAO.create(c);
 
-        Course retrieved = courseDAO.read(102);
-        assertNotNull(retrieved);
-        assertEquals("CS102", retrieved.getCourseCode());
-        assertEquals("Data Structures", retrieved.getCourseName());
-        assertEquals("An advanced course on data structures.", retrieved.getCourseDescription());
+        Course read = courseDAO.read(201);
+        assertNotNull(read);
+        assertEquals("CS201", read.getCourseCode());
 
-        // Clean up
-        courseDAO.delete(102);
+        courseDAO.delete(201);
+        assertNull(courseDAO.read(201));
     }
 
     @Test
-    void testRead() throws SQLException {
-        Course course = courseDAO.read(101);
-        assertNotNull(course);
-        assertEquals("CS101", course.getCourseCode());
-        assertEquals("Introduction to Computer Science", course.getCourseName());
+    void testUpdatePersistsChange() throws SQLException {
+        Course c = new Course(202, "CS202", "DS", "Data Structures");
+        courseDAO.create(c);
+
+        // update description
+        courseDAO.update("CS202", "DS Advanced", "Updated Description");
+
+        Course updated = courseDAO.read(202);
+        assertNotNull(updated);
+        assertEquals("Updated Description", updated.getCourseDescription());
+
+        courseDAO.delete(202);
     }
 
     @Test
-    void testUpdate() throws SQLException {
-        Course course = courseDAO.read(101);
-        assertNotNull(course);
+    void testMapResultSetToList_withAndWithoutData() throws SQLException {
+        // empty state
+        List<Course> empty = courseDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM courses"));
+        assertNotNull(empty);
+        assertEquals(0, empty.size());
 
-        // Update course description
-        course.setCourseDescription("A comprehensive introduction to computer science.");
-        courseDAO.update(course.getCourseCode(), course.getCourseName(), course.getCourseDescription());
-
-        Course updatedCourse = courseDAO.read(101);
-        assertEquals("A comprehensive introduction to computer science.", updatedCourse.getCourseDescription());
-    }
-
-    @Test
-    void testDelete() throws SQLException {
-        // Insert a new course to delete
-        String query = "INSERT INTO courses (course_id, course_code, course_name, course_description) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, 103);
-            ps.setString(2, "CS103");
-            ps.setString(3, "Algorithms");
-            ps.setString(4, "A course on algorithms.");
+        // insert and test non-empty
+        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO courses (course_id, course_code, course_name, course_description) VALUES (?,?,?,?)")) {
+            ps.setInt(1, 301);
+            ps.setString(2, "CS301");
+            ps.setString(3, "Algo");
+            ps.setString(4, "Algorithms");
             ps.executeUpdate();
         }
 
-        courseDAO.delete(103);
+        List<Course> nonEmpty = courseDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM courses"));
+        assertNotNull(nonEmpty);
+        assertTrue(nonEmpty.size() >= 1);
 
-        Course course = courseDAO.read(103);
-        assertNull(course);
+        // cleanup
+        courseDAO.delete(301);
     }
 
     @Test
-    void testMapResultSetToList() throws SQLException {
-        List<Course> courses = courseDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM courses"));
-        assertNotNull(courses);
-        assertTrue(courses.size() > 0, "There should be at least one course in the database.");
+    void testReadNonExistentReturnsNull() throws SQLException {
+        assertNull(courseDAO.read(-1));
     }
 }
