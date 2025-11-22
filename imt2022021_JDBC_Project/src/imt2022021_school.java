@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.util.*;
 import java.io.IOException;
 
-public class imt2022025_school {
+public class imt2022021_school {
     
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost:3306/Schooldb";
