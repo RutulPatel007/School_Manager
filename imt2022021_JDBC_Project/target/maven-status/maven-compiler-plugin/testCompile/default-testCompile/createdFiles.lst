@@ -1,0 +1,4 @@
+com/schoolmanagement/tests/TeacherDAOTest.class
+com/schoolmanagement/tests/BookDAOTest.class
+com/schoolmanagement/tests/CourseDAOTest.class
+com/schoolmanagement/tests/StudentDAOTest.class

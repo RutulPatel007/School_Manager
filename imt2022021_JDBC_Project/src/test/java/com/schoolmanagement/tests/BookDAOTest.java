@@ -17,8 +17,19 @@ public class BookDAOTest {
     @BeforeAll
     static void setupDatabase() throws SQLException {
         // Establish the database connection
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/school_db", "root", "admin");
+        connection = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
+            "root",
+            "admin"
+        );
+        
         bookDAO = new BookDAO(connection);
+        Statement st = connection.createStatement();
+        st.execute("INSERT IGNORE INTO libraries (id, name) VALUES (1, 'Main Library')");
+    st.execute("INSERT IGNORE INTO teachers (id, emp_id, name, dob, address, salary) " +
+               "VALUES (1, 'T001', 'Teacher One', '1980-01-01', 'XYZ', 50000)");
+    st.execute("INSERT IGNORE INTO courses (course_id, course_code, course_name, course_description) " +
+               "VALUES (1, 'C001', 'Algorithms', 'Test Course')");
     }
 
     @AfterAll

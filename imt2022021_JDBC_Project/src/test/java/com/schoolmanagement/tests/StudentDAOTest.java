@@ -18,7 +18,12 @@ public class StudentDAOTest {
     @BeforeAll
     static void setupDatabase() throws SQLException {
         // Establish the database connection
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/school_db", "root", "admin");
+        connection = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
+            "root",
+            "admin"
+        );
+        
         studentDAO = new StudentDAO(connection);
     }
 

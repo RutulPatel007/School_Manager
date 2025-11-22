@@ -1,0 +1,17 @@
+com/schoolmanagement/models/Student.class
+com/schoolmanagement/models/Teacher.class
+com/schoolmanagement/database/DatabaseManager.class
+com/schoolmanagement/dao/TeacherDAO.class
+com/schoolmanagement/dao/CourseDAO.class
+com/schoolmanagement/dao/BaseDAO.class
+com/schoolmanagement/models/Person.class
+com/schoolmanagement/main/Main.class
+com/schoolmanagement/models/Book.class
+com/schoolmanagement/factory/EntityFactory.class
+com/schoolmanagement/models/Course.class
+com/schoolmanagement/dao/BookDAO.class
+com/schoolmanagement/dao/StudentDAO.class
+com/schoolmanagement/models/Library.class
+com/schoolmanagement/services/SchoolService.class
+com/schoolmanagement/dao/LibraryDAO.class
+com/schoolmanagement/factory/EntityFactory$EntityType.class

@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.schoolmanagement</groupId>
+    <artifactId>school-manager</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versions -->
+        <junit.version>5.9.3</junit.version>
+        <pitest.version>1.16.0</pitest.version>
+        <pitest.junit5.version>1.2.0</pitest.junit5.version>
+        <jacoco.version>0.8.12</jacoco.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- MySQL Connector -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire (needed for JUnit 5) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <!-- JaCoCo Code Coverage -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <!-- Create coverage report -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- PIT Mutation Testing -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest.junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+
+                    <!-- MUTATION TARGET -->
+                    <targetClasses>
+                        <param>com.schoolmanagement.dao.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.schoolmanagement.tests.*</param>
+                    </targetTests>
+
+                    <!-- MUTATORS (Full Mutant Set) -->
+                    <mutators>
+                        <mutator>STRONGER</mutator>
+                    </mutators>
+
+                    <!-- REPORT FORMAT -->
+                    <outputFormats>
+                        <value>HTML</value>
+                    </outputFormats>
+
+                    <!-- FAIL BUILD IF MUTATION SCORE LOW -->
+                    <mutationThreshold>14</mutationThreshold>
+                    <coverageThreshold>10</coverageThreshold>
+
+                    <!-- PERFORMANCE -->
+                    <threads>4</threads>
+                    <timeoutConst>4000</timeoutConst>
+                    <timeoutFactor>1.25</timeoutFactor>
+
+                    <!-- REPORT DIRECTORY -->
+                    <reportsDirectory>${project.build.directory}/pit-reports</reportsDirectory>
+
+                    <!-- Fix JUnit 5 module path issues -->
+                    <useClasspathFile>true</useClasspathFile>
+
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
