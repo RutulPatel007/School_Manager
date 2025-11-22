@@ -1,0 +1,14 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "/home/varn03/Desktop/mysql-connector-j-8.3.0.jar",
+        "mysql-connector-j-8.3.0.jar",
+        "junit-jupiter-api-5.9.3.jar",
+        "junit-jupiter-engine-5.9.3.jar",
+        "apiguardian-api-1.1.2.jar",
+        "junit-platform-console-standalone-1.11.3.jar"
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "imt2022025_school",
+            "request": "launch",
+            "mainClass": "imt2022025_school",
+            "projectName": "imt2022025_JDBC_Project_19348340"
+        },
+        {
+            "type": "java",
+            "name": "JdbcDemo",
+            "request": "launch",
+            "mainClass": "JdbcDemo",
+            "projectName": "imt2022025_JDBC_Project_19348340"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "classpath": "${workspaceFolder}/mysql-connector-java-8.0.26.jar"
+        }
+    ]
+}
