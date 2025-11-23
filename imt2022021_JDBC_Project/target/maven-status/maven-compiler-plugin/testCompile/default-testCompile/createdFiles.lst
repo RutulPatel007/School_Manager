@@ -1,4 +1,8 @@
+com/schoolmanagement/tests/BookDAOTest_Mutations.class
+com/schoolmanagement/tests/StudentDAOTest_Mutations.class
+com/schoolmanagement/tests/CourseDAOTest_Mutations.class
 com/schoolmanagement/tests/TeacherDAOTest.class
 com/schoolmanagement/tests/BookDAOTest.class
 com/schoolmanagement/tests/CourseDAOTest.class
+com/schoolmanagement/tests/TeacherDAOTest_Mutations.class
 com/schoolmanagement/tests/StudentDAOTest.class

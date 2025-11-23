@@ -1,4 +1,8 @@
-/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/BookDAOTest.java
-/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/TeacherDAOTest.java
-/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/StudentDAOTest.java
-/Users/rutul/Documents/SchoolManager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/CourseDAOTest.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/CourseDAOTest.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/TeacherDAOTest_Mutations.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/BookDAOTest.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/CourseDAOTest_Mutations.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/StudentDAOTest.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/StudentDAOTest_Mutations.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/BookDAOTest_Mutations.java
+/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/src/test/java/com/schoolmanagement/tests/TeacherDAOTest.java

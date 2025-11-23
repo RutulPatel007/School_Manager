@@ -18,14 +18,15 @@ public class StudentDAOTest {
     @BeforeAll
     static void setupAll() throws SQLException {
         connection = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
-            "root",
-            "admin"
+                "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
+                "root",
+                "admin"
         );
         studentDAO = new StudentDAO(connection);
 
-        // ensure a course exists
+        // Ensure a course & library exists
         try (Statement st = connection.createStatement()) {
+            st.execute("INSERT IGNORE INTO libraries (id, name) VALUES (1,'Main Library')");
             st.execute("INSERT IGNORE INTO courses (course_id, course_code, course_name, course_description) VALUES (1,'C001','Algorithms','Test')");
         }
     }
@@ -45,143 +46,181 @@ public class StudentDAOTest {
         }
     }
 
+    // Utility to fetch auto-generated student_id using roll_number
+    private int getStudentIdByRoll(String roll) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT id FROM students WHERE roll_number=?")) {
+            ps.setString(1, roll);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        }
+        return -1;
+    }
+
     @Test
     void testCreateReadDeleteStudent() throws SQLException {
-        Student s = new Student(401, "R401", "Alice", "2000-01-01", "Addr", 3.5f);
+        Student s = new Student(0, "R401", "Alice", "2000-01-01", "Addr", 3.5f);
         studentDAO.create(s);
 
-        Student read = studentDAO.read(401);
+        int id = getStudentIdByRoll("R401");
+        assertTrue(id > 0);
+
+        Student read = studentDAO.read(id);
         assertNotNull(read);
         assertEquals("Alice", read.getName());
 
-        studentDAO.delete(401);
-        assertNull(studentDAO.read(401));
+        studentDAO.delete(id);
+        assertNull(studentDAO.read(id));
     }
 
     @Test
     void testUpdateAddressAndPersisted() throws SQLException {
-        Student s = new Student(402, "R402", "Bob", "1999-05-05", "OldAddr", 3.0f);
+        Student s = new Student(0, "R402", "Bob", "1999-05-05", "OldAddr", 3.0f);
         studentDAO.create(s);
 
-        studentDAO.update("R402", "NewAddr");
+        int id = getStudentIdByRoll("R402");
 
-        Student updated = studentDAO.read(402);
+        studentDAO.updateAddress("R402", "NewAddr");
+
+        Student updated = studentDAO.read(id);
         assertNotNull(updated);
         assertEquals("NewAddr", updated.getAddress());
-
-        studentDAO.delete(402);
     }
 
     @Test
     void testUpdateCGPA_changesValue() throws SQLException {
-        Student s = new Student(403, "R403", "Charlie", "1998-07-07", "Addr3", 3.1f);
+        Student s = new Student(0, "R403", "Charlie", "1998-07-07", "Addr3", 3.1f);
         studentDAO.create(s);
 
-        studentDAO.updateCGPA(403, 4.0f);
+        int id = getStudentIdByRoll("R403");
+        studentDAO.updateCGPA(id, 4.0f);
 
-        Student after = studentDAO.read(403);
+        Student after = studentDAO.read(id);
         assertNotNull(after);
         assertEquals(4.0f, after.getCgpa(), 0.0001);
-
-        studentDAO.delete(403);
     }
 
     @Test
     void testGetTopper_andEmptyCase() throws SQLException {
-        // empty DB -> null
-        List<Student> allBefore = studentDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM students"));
-        for (Student s : allBefore) studentDAO.delete(s.getId());
-
         assertNull(studentDAO.getTopper());
 
-        // create two students and ensure topper returned
-        studentDAO.create(new Student(404, "R404", "Topper", "2001-01-01", "X", 3.9f));
-        studentDAO.create(new Student(405, "R405", "Other", "2001-01-02", "Y", 3.2f));
+        studentDAO.create(new Student(0, "R404", "Topper", "2001-01-01", "X", 3.9f));
+        studentDAO.create(new Student(0, "R405", "Other", "2001-01-02", "Y", 3.2f));
 
         Student topper = studentDAO.getTopper();
         assertNotNull(topper);
         assertEquals("Topper", topper.getName());
-
-        studentDAO.delete(404);
-        studentDAO.delete(405);
     }
 
     @Test
     void testAddAndRemoveStudentFromCourse_affectsDB() throws SQLException {
-        studentDAO.create(new Student(406, "R406", "EnrollMe", "2002-02-02", "Z", 3.0f));
+        studentDAO.create(new Student(0, "R406", "EnrollMe", "2002-02-02", "Z", 3.0f));
+        int id = getStudentIdByRoll("R406");
 
-        // ensure not enrolled
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?")) {
-            ps.setInt(1, 406);
-            ps.setInt(2, 1);
-            try (ResultSet rs = ps.executeQuery()) {
-                assertFalse(rs.next());
-            }
+        // Not enrolled initially
+        assertFalse(isEnrolled(id, 1));
+
+        studentDAO.addStudentToCourse(id, 1);
+        assertTrue(isEnrolled(id, 1));
+
+        studentDAO.removeStudentFromCourse(id, 1);
+        assertFalse(isEnrolled(id, 1));
+    }
+
+    @Test
+    void testDeleteNonExistingStudent_doesNotThrow() {
+        assertDoesNotThrow(() -> studentDAO.delete(999999));
+    }
+
+    @Test
+    void testUpdateAddress_nonExistingRollNumber_noEffect() throws SQLException {
+        studentDAO.updateAddress("New", "DOES_NOT_EXIST");
+
+        // Should not throw, just 0 rows updated
+        assertDoesNotThrow(() -> studentDAO.updateAddress("New", "DOES_NOT_EXIST"));
+    }
+
+    @Test
+    void testMapResultSetToList_emptyResultSet() throws Exception {
+        ResultSet rs = connection.createStatement()
+                .executeQuery("SELECT * FROM students WHERE id = -1");
+
+        List<Student> list = studentDAO.mapResultSetToList(rs);
+        assertNotNull(list);
+        assertEquals(0, list.size());
+    }
+
+    @Test
+    void testCreate_SQLExceptionHandled() throws SQLException {
+        // Clear dependent entries first to avoid FK issues
+        try (Statement st = connection.createStatement()) {
+            st.execute("DELETE FROM enrollments");
+            st.execute("DELETE FROM students");
         }
+    
+        // Force duplicate key to trigger SQLException
+        studentDAO.create(new Student(999, "R999", "Test", "2000-01-01", "X", 3.0f));
+    
+        assertThrows(SQLException.class, () -> {
+            studentDAO.create(new Student(999, "R999", "Dup", "2000-01-01", "X2", 3.5f));
+        });
+    }
+    
 
-        studentDAO.addStudentToCourse(406, 1);
 
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?")) {
-            ps.setInt(1, 406);
-            ps.setInt(2, 1);
-            try (ResultSet rs = ps.executeQuery()) {
-                assertTrue(rs.next());
-            }
+
+    private boolean isEnrolled(int studentId, int courseId) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM enrollments WHERE student_id=? AND course_id=?")) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, courseId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
         }
-
-        studentDAO.removeStudentFromCourse(406, 1);
-
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?")) {
-            ps.setInt(1, 406);
-            ps.setInt(2, 1);
-            try (ResultSet rs = ps.executeQuery()) {
-                assertFalse(rs.next());
-            }
-        }
-
-        studentDAO.delete(406);
     }
 
     @Test
     void testGetBooksForStudents_whenNoneAndWhenPresent() throws SQLException {
-        // ensure student exists
-        studentDAO.create(new Student(407, "R407", "Bookless", "2003-03-03", "Addr", 3.0f));
+        studentDAO.create(new Student(0, "R407", "Bookless", "2003-03-03", "Addr", 3.0f));
+        int id = getStudentIdByRoll("R407");
 
-        // no books -> should return empty list (implementation returns empty or null; assert not null to kill null-return mutants)
-        List<Book> none = studentDAO.getBooksforStudents(407);
+        List<Book> none = studentDAO.getBooksForStudent(id);
         assertNotNull(none);
         assertEquals(0, none.size());
 
-        // create a book, map to a course, enroll student -> then should return at least one
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO books (id, book_id, title, author, library_id) VALUES (?,?,?,?,?)")) {
-            ps.setInt(1, 500);
-            ps.setString(2, "B500");
-            ps.setString(3, "StuBook");
-            ps.setString(4, "Aut");
-            ps.setInt(5, 1);
+        // Create book → map to course → enroll student
+        try (PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO books (book_id,title,author,library_id) VALUES (?,?,?,?)")) {
+            ps.setString(1, "B500");
+            ps.setString(2, "StuBook");
+            ps.setString(3, "Aut");
+            ps.setInt(4, 1);
             ps.executeUpdate();
         }
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO course_books (course_id, book_id) VALUES (?,?)")) {
-            ps.setInt(1, 1);
-            ps.setInt(2, 500);
-            ps.executeUpdate();
-        }
-        studentDAO.addStudentToCourse(407, 1);
 
-        List<Book> some = studentDAO.getBooksforStudents(407);
+        int bookId = getBookIdByCode("B500");
+
+        try (PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO course_books (course_id, book_id) VALUES (?,?)")) {
+            ps.setInt(1, 1);
+            ps.setInt(2, bookId);
+            ps.executeUpdate();
+        }
+
+        studentDAO.addStudentToCourse(id, 1);
+
+        List<Book> some = studentDAO.getBooksForStudent(id);
         assertNotNull(some);
         assertTrue(some.size() >= 1);
+    }
 
-        // cleanup
-        studentDAO.delete(407);
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM course_books WHERE course_id = ? AND book_id = ?")) {
-            ps.setInt(1, 1);
-            ps.setInt(2, 500);
-            ps.executeUpdate();
+    private int getBookIdByCode(String code) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT id FROM books WHERE book_id=?")) {
+            ps.setString(1, code);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("id");
         }
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM books WHERE id = ?")) {
-            ps.setInt(1, 500);
-            ps.executeUpdate();
-        }
+        return -1;
     }
 }

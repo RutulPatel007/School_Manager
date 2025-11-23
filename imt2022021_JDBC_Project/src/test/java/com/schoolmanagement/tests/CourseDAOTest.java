@@ -39,58 +39,94 @@ public class CourseDAOTest {
 
     @Test
     void testCreateReadDeleteCycle() throws SQLException {
-        Course c = new Course(201, "CS201", "OS", "Operating Systems");
+        // DAO create() uses auto-increment, so courseId from constructor is ignored.
+        Course c = new Course(0, "CS201", "OS", "Operating Systems");
         courseDAO.create(c);
 
-        Course read = courseDAO.read(201);
+        int id = fetchCourseId("CS201");
+        assertTrue(id > 0);
+
+        Course read = courseDAO.read(id);
         assertNotNull(read);
         assertEquals("CS201", read.getCourseCode());
 
-        courseDAO.delete(201);
-        assertNull(courseDAO.read(201));
+        courseDAO.delete(id);
+        assertNull(courseDAO.read(id));
     }
 
     @Test
     void testUpdatePersistsChange() throws SQLException {
-        Course c = new Course(202, "CS202", "DS", "Data Structures");
+        Course c = new Course(0, "CS202", "DS", "Data Structures");
         courseDAO.create(c);
 
-        // update description
+        int id = fetchCourseId("CS202");
+        assertTrue(id > 0);
+
         courseDAO.update("CS202", "DS Advanced", "Updated Description");
 
-        Course updated = courseDAO.read(202);
+        Course updated = courseDAO.read(id);
         assertNotNull(updated);
         assertEquals("Updated Description", updated.getCourseDescription());
-
-        courseDAO.delete(202);
     }
 
     @Test
     void testMapResultSetToList_withAndWithoutData() throws SQLException {
-        // empty state
-        List<Course> empty = courseDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM courses"));
+        // empty
+        List<Course> empty = courseDAO.getAllCourses();
         assertNotNull(empty);
         assertEquals(0, empty.size());
 
-        // insert and test non-empty
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO courses (course_id, course_code, course_name, course_description) VALUES (?,?,?,?)")) {
-            ps.setInt(1, 301);
-            ps.setString(2, "CS301");
-            ps.setString(3, "Algo");
-            ps.setString(4, "Algorithms");
+        // insert 1 row
+        try (PreparedStatement ps = connection.prepareStatement(
+            "INSERT INTO courses (course_code, course_name, course_description) VALUES (?,?,?)"
+        )) {
+            ps.setString(1, "CS301");
+            ps.setString(2, "Algo");
+            ps.setString(3, "Algorithms");
             ps.executeUpdate();
         }
 
-        List<Course> nonEmpty = courseDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM courses"));
-        assertNotNull(nonEmpty);
-        assertTrue(nonEmpty.size() >= 1);
-
-        // cleanup
-        courseDAO.delete(301);
+        List<Course> list = courseDAO.getAllCourses();
+        assertNotNull(list);
+        assertTrue(list.size() >= 1);
     }
 
     @Test
     void testReadNonExistentReturnsNull() throws SQLException {
         assertNull(courseDAO.read(-1));
+    }
+
+    @Test
+    void testDeleteNonExistingCourse_doesNotThrow() {
+        assertDoesNotThrow(() -> courseDAO.delete(999999));
+    }
+
+    @Test
+    void testUpdateNonExistingCourse_noThrow() {
+        assertDoesNotThrow(() -> courseDAO.update("NO_SUCH", "X", "Y"));
+    }
+
+    @Test
+    void testMapResultSetToList_emptyCase() throws Exception {
+        ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM courses WHERE course_id = -1");
+        List<Course> list = courseDAO.mapResultSetToList(rs);
+        assertNotNull(list);
+        assertEquals(0, list.size());
+    }
+
+    
+
+
+
+    // Utility method: fetch course_id from course_code
+    private int fetchCourseId(String code) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+            "SELECT course_id FROM courses WHERE course_code = ?"
+        )) {
+            ps.setString(1, code);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("course_id");
+        }
+        return -1;
     }
 }

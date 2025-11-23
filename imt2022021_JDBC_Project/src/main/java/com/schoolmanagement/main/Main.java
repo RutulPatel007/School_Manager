@@ -5,7 +5,7 @@ import com.schoolmanagement.services.SchoolService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
+import java.sql.SQLException;
 
 // public class Main {
 //     public static void main(String[] args) {
@@ -493,13 +493,21 @@ public class Main {
         schoolService.unmarkBookWithCourse(bookId, courseId);
     }
 
-    private static void addStudentToCourse(Scanner scanner) {
+   private static void addStudentToCourse(Scanner scanner) {
         System.out.print("Enter Student ID: ");
         int studentId = scanner.nextInt();
+
         System.out.print("Enter Course ID: ");
         int courseId = scanner.nextInt();
-        schoolService.addStudentToCourse(studentId, courseId);
+
+        try {
+            schoolService.addStudentToCourse(studentId, courseId);
+            System.out.println("Student added to course successfully.");
+        } catch (SQLException e) {
+            System.out.println("Error adding student to course: " + e.getMessage());
+        }
     }
+
 
     private static void removeStudentFromCourse(Scanner scanner) {
         System.out.print("Enter Student ID: ");
@@ -512,7 +520,7 @@ public class Main {
     private static void getStudentBooks(Scanner scanner) {
         System.out.print("Enter Student ID to get books: ");
         int studentId = scanner.nextInt();
-        schoolService.getStudentbooks(studentId);
+        schoolService.getStudentBooks(studentId);
     }
 
     private static void getLibraryById(Scanner scanner) {
@@ -535,7 +543,7 @@ public class Main {
         String newName = scanner.nextLine();
         
         try {
-            schoolService.updateLibrary(newName, libraryId);
+            schoolService.updateLibrary(libraryId, newName);
             System.out.println("Library updated: " + newName);
         } catch (Exception e) {
             System.out.println("Error updating library: " + e.getMessage());

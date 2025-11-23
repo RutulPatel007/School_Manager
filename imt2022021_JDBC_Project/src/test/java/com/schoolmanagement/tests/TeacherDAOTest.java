@@ -17,9 +17,9 @@ public class TeacherDAOTest {
     @BeforeAll
     static void setupAll() throws SQLException {
         connection = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
-            "root",
-            "admin"
+                "jdbc:mysql://localhost:3306/school_db?useSSL=false&allowPublicKeyRetrieval=true",
+                "root",
+                "admin"
         );
         teacherDAO = new TeacherDAO(connection);
     }
@@ -36,67 +36,90 @@ public class TeacherDAOTest {
         }
     }
 
+    // Utility to fetch auto-generated teacher ID using emp_id
+    private int getTeacherIdByEmpId(String empId) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT id FROM teachers WHERE emp_id=?")) {
+            ps.setString(1, empId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        }
+        return -1;
+    }
+    
+    @Test
+    void testDeleteNonExistingTeacher_doesNotThrow() {
+        assertDoesNotThrow(() -> teacherDAO.delete(999999));
+    }
+
+
+    @Test
+    void testUpdateAddress_nonExistingEmpId() {
+        assertDoesNotThrow(() -> teacherDAO.updateAddress("X", "NO_SUCH_EMP"));
+    }
+
+
+
     @Test
     void testCreateReadDeleteCycle() throws SQLException {
-        Teacher t = new Teacher(601, "E601", "Teach", "1970-01-01", "Addr", 45000f);
+        Teacher t = new Teacher(0, "E601", "Teach", "1970-01-01", "Addr", 45000f);
         teacherDAO.create(t);
 
-        Teacher read = teacherDAO.read(601);
+        int id = getTeacherIdByEmpId("E601");
+        assertTrue(id > 0);
+
+        Teacher read = teacherDAO.read(id);
         assertNotNull(read);
         assertEquals("Teach", read.getName());
 
-        teacherDAO.delete(601);
-        assertNull(teacherDAO.read(601));
+        teacherDAO.delete(id);
+        assertNull(teacherDAO.read(id));
     }
 
     @Test
     void testUpdateAddress_andPersisted() throws SQLException {
-        teacherDAO.create(new Teacher(602, "E602", "Upd", "1971-02-02", "Old", 50000f));
-        teacherDAO.update("NewAddr", "E602");
+        teacherDAO.create(new Teacher(0, "E602", "Upd", "1971-02-02", "Old", 50000f));
 
-        Teacher after = teacherDAO.read(602);
+        int id = getTeacherIdByEmpId("E602");
+
+        teacherDAO.updateAddress("NewAddr", "E602");
+
+        Teacher after = teacherDAO.read(id);
         assertNotNull(after);
         assertEquals("NewAddr", after.getAddress());
-
-        teacherDAO.delete(602);
     }
 
     @Test
     void testIncrementSalary_mutatesValue() throws SQLException {
-        teacherDAO.create(new Teacher(603, "E603", "Sal", "1972-03-03", "Addr", 50000f));
+        teacherDAO.create(new Teacher(0, "E603", "Sal", "1972-03-03", "Addr", 50000f));
+        int id = getTeacherIdByEmpId("E603");
 
-        // read before
-        Teacher before = teacherDAO.read(603);
+        Teacher before = teacherDAO.read(id);
         assertNotNull(before);
         float old = before.getSalary();
 
-        teacherDAO.incrementSalary(603, 2000f);
+        teacherDAO.incrementSalary(id, 2000f);
 
-        Teacher after = teacherDAO.read(603);
+        Teacher after = teacherDAO.read(id);
         assertNotNull(after);
         assertEquals(old + 2000f, after.getSalary(), 0.001);
-
-        teacherDAO.delete(603);
     }
 
     @Test
     void testGetHighestPaidTeacher_andEmptyCase() throws SQLException {
-        // empty -> null
+        // empty -> should return null
         try (Statement st = connection.createStatement()) {
             st.execute("DELETE FROM teachers");
         }
         assertNull(teacherDAO.getHighestPaidTeacher());
 
-        // create two teachers
-        teacherDAO.create(new Teacher(604, "E604", "High", "1973-04-04", "A", 70000f));
-        teacherDAO.create(new Teacher(605, "E605", "Low", "1974-05-05", "B", 40000f));
+        // add two
+        teacherDAO.create(new Teacher(0, "E604", "High", "1973-04-04", "A", 70000f));
+        teacherDAO.create(new Teacher(0, "E605", "Low", "1974-05-05", "B", 40000f));
 
         Teacher highest = teacherDAO.getHighestPaidTeacher();
         assertNotNull(highest);
         assertEquals("High", highest.getName());
-
-        teacherDAO.delete(604);
-        teacherDAO.delete(605);
     }
 
     @Test
@@ -105,16 +128,17 @@ public class TeacherDAOTest {
             st.execute("DELETE FROM teachers");
         }
 
-        List<Teacher> empty = teacherDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM teachers"));
+        List<Teacher> empty = teacherDAO.mapResultSetToList(
+                connection.createStatement().executeQuery("SELECT * FROM teachers")
+        );
         assertNotNull(empty);
         assertEquals(0, empty.size());
 
-        // insert one
-        teacherDAO.create(new Teacher(606, "E606", "One", "1975-06-06", "C", 48000f));
-        List<Teacher> some = teacherDAO.mapResultSetToList(connection.createStatement().executeQuery("SELECT * FROM teachers"));
+        teacherDAO.create(new Teacher(0, "E606", "One", "1975-06-06", "C", 48000f));
+        List<Teacher> some = teacherDAO.mapResultSetToList(
+                connection.createStatement().executeQuery("SELECT * FROM teachers")
+        );
         assertNotNull(some);
         assertTrue(some.size() >= 1);
-
-        teacherDAO.delete(606);
     }
 }

@@ -101,6 +101,11 @@
                         <param>com.schoolmanagement.tests.*</param>
                     </targetTests>
 
+                    <!-- <targetTests>
+                        <param>com.schoolmanagement.tests.*_Mutations</param>
+                    </targetTests> -->
+
+
                     <!-- MUTATORS (Full Mutant Set) -->
                     <mutators>
                         <mutator>STRONGER</mutator>
