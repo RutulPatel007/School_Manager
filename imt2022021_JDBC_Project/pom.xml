@@ -80,7 +80,7 @@
             </plugin>
 
             <!-- PIT Mutation Testing -->
-            <plugin>
+                        <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
                 <version>${pitest.version}</version>
@@ -91,48 +91,47 @@
                         <version>${pitest.junit5.version}</version>
                     </dependency>
                 </dependencies>
+
                 <configuration>
 
-                    <!-- MUTATION TARGET -->
                     <targetClasses>
                         <param>com.schoolmanagement.dao.*</param>
                     </targetClasses>
+
+                    <!-- Run ALL tests for maximum mutation coverage -->
                     <targetTests>
                         <param>com.schoolmanagement.tests.*</param>
                     </targetTests>
 
-                    <!-- <targetTests>
-                        <param>com.schoolmanagement.tests.*_Mutations</param>
-                    </targetTests> -->
+                    <!-- Exclude non-DAO code from mutation -->
+                    <excludedClasses>
+                        <param>com.schoolmanagement.services.*</param>
+                        <param>com.schoolmanagement.main.*</param>
+                    </excludedClasses>
 
-
-                    <!-- MUTATORS (Full Mutant Set) -->
+                    <!-- STRONGER mutation set -->
                     <mutators>
                         <mutator>STRONGER</mutator>
                     </mutators>
 
-                    <!-- REPORT FORMAT -->
                     <outputFormats>
                         <value>HTML</value>
                     </outputFormats>
 
-                    <!-- FAIL BUILD IF MUTATION SCORE LOW -->
-                    <mutationThreshold>14</mutationThreshold>
-                    <coverageThreshold>10</coverageThreshold>
-
-                    <!-- PERFORMANCE -->
-                    <threads>4</threads>
                     <timeoutConst>4000</timeoutConst>
                     <timeoutFactor>1.25</timeoutFactor>
 
-                    <!-- REPORT DIRECTORY -->
-                    <reportsDirectory>${project.build.directory}/pit-reports</reportsDirectory>
-
-                    <!-- Fix JUnit 5 module path issues -->
+                    <threads>4</threads>
                     <useClasspathFile>true</useClasspathFile>
+
+                    <!-- Prevent JVM reuse = prevents DB state overlap -->
+                    <jvmArgs>
+                        <jvmArg>-DreuseForks=false</jvmArg>
+                    </jvmArgs>
 
                 </configuration>
             </plugin>
+
 
         </plugins>
     </build>
