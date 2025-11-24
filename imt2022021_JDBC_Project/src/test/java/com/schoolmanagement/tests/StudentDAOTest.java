@@ -58,6 +58,21 @@ public class StudentDAOTest {
     }
 
     @Test
+    @Order(1) // Assuming you want this near the start
+    void testGetAllStudents_returnsNonEmptyList() throws SQLException {
+        // ARRANGE: Ensure we have at least one student in the DB
+        Student s = new Student(0, "ALL01", "All Test", "1999-01-01", "X", 3.0f);
+        studentDAO.create(s);
+
+        // ACT
+        List<Student> allStudents = studentDAO.getAllStudents();
+
+        // ASSERT
+        assertNotNull(allStudents, "The list returned by getAllStudents should not be null.");
+        assertTrue(allStudents.size() >= 1, "getAllStudents should return a list with at least one student.");
+    }
+
+    @Test
     void testCreateReadDeleteStudent() throws SQLException {
         Student s = new Student(0, "R401", "Alice", "2000-01-01", "Addr", 3.5f);
         studentDAO.create(s);
@@ -166,7 +181,35 @@ public class StudentDAOTest {
         });
     }
     
+    @Test
+    @Order(10)
+    void testGetTopper_noStudents_returnsNull() throws SQLException {
+        // ARRANGE: Ensure table is empty (via @BeforeEach or explicit clear if necessary)
+        
+        // ACT
+        Student topper = studentDAO.getTopper();
+        
+        // ASSERT: This must kill the mutant
+        assertNull(topper, "Topper should be null when no students are present.");
+    }
 
+    @Test
+    @Order(11)
+    void testUpdateCGPA_exception_noCrash() {
+        // ARRANGE: Attempt to pass an invalid Student ID that violates a potential foreign key 
+        // or triggers a database error.
+        int nonExistentStudentId = 9999999; 
+        float validCGPA = 4.0f;
+
+        // ACT & ASSERT: Since the method catches the exception internally and prints the stack trace, 
+        // we only assert that it completes without throwing an unhandled exception.
+        assertDoesNotThrow(() -> studentDAO.updateCGPA(nonExistentStudentId, validCGPA), 
+                        "Update CGPA on a non-existent ID should not crash.");
+                        
+        // This test covers L83 (updateCGPA catch block).
+        // The same logic should apply to L90, L110, and L138/139 (getBooksForStudent). 
+        // If you run PIT again, these should now be covered.
+    }
 
 
     private boolean isEnrolled(int studentId, int courseId) throws SQLException {

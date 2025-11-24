@@ -51,7 +51,6 @@ public class BookDAOTest_Mutations {
     void testUnmarkBookWithCourse_invalid() {
         assertDoesNotThrow(() -> dao.unmarkBookWithCourse(-99, -88));
     }
-
     @Test
     void testGetBooksForCourse_empty() throws Exception {
         List<Book> list = dao.getBooksForCourse(2);
@@ -76,4 +75,7 @@ public class BookDAOTest_Mutations {
     void testRead_invalid_returnsNull() throws Exception {
         assertNull(dao.read(-555));
     }
+
 }
+
+

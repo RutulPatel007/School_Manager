@@ -151,6 +151,52 @@ public class BookDAOTest {
         assertEquals(0, list.size());
     }
 
+    @Test
+    @Order(10) // Place at the end or adjust numbering
+    void testGetAllBooks_returnsNonEmptyList() throws SQLException {
+        // ARRANGE: Insert a known book
+        Book b = new Book(0, "B_ALL", "All Books Test", "DAO Test", 1);
+        bookDAO.create(b);
+
+        // ACT
+        List<Book> allBooks = bookDAO.getAllBooks();
+
+        // ASSERT
+        assertNotNull(allBooks, "The list returned by getAllBooks should not be null.");
+        assertTrue(allBooks.size() >= 1, "getAllBooks should return a list with at least one book.");
+
+        // Optionally assert the presence of the created book to verify content mapping
+        assertTrue(allBooks.stream().anyMatch(book -> "B_ALL".equals(book.getBookId())));
+    }
+
+    @Test
+    @Order(11)
+    void testMarkBookWithCourse_invalidID_failsSilently() throws SQLException {
+        // ARRANGE: Use a non-existent Book ID, e.g., 9999999, which should violate a foreign key constraint (if set up) 
+        // or just fail the insert.
+        int invalidBookId = 9999999; 
+        int validCourseId = 1;
+
+        // ACT
+        // The method handles the exception internally (L80 catch block is hit)
+        bookDAO.markBookWithCourse(invalidBookId, validCourseId);
+
+        // ASSERT: We verify the non-event (nothing was inserted). This assertion validates 
+        // that the `catch` block did not prevent the program from working correctly after the error.
+        try (PreparedStatement check = connection.prepareStatement(
+            "SELECT * FROM course_books WHERE course_id = ? AND book_id = ?"
+        )) {
+            check.setInt(1, validCourseId);
+            check.setInt(2, invalidBookId);
+            ResultSet rs = check.executeQuery();
+            // The operation failed due to the invalid ID, so the entry should NOT exist.
+            assertFalse(rs.next(), "The course_books entry should NOT have been created due to invalid ID.");
+        }
+        
+        // This test forces the DAO method to fail and hit the `catch` block, 
+        // ensuring the code at L80 is executed.
+    }
+
 
     @Test
     void testGetBooksForCourse_returnsList() throws SQLException {
