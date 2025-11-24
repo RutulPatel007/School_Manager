@@ -19,18 +19,18 @@ public abstract class BaseDAO<T> {
     public abstract void delete(int id) throws SQLException;
 
     // Helper method to close PreparedStatement and ResultSet resources
-    protected void closeResources(PreparedStatement ps, ResultSet rs) {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    // protected void closeResources(PreparedStatement ps, ResultSet rs) {
+    //     try {
+    //         if (rs != null) {
+    //             rs.close();
+    //         }
+    //         if (ps != null) {
+    //             ps.close();
+    //         }
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     // Utility method to create a PreparedStatement with a query and parameters
     protected PreparedStatement createPreparedStatement(String query, Object... params) throws SQLException {
