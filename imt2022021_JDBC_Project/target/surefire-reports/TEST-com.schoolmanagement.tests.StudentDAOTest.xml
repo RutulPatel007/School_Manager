@@ -1,69 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.schoolmanagement.tests.StudentDAOTest" time="0.087" tests="13" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.schoolmanagement.tests.StudentDAOTest" time="0.12" tests="13" errors="0" skipped="0" failures="0">
   <properties>
-    <property name="java.specification.version" value="17"/>
+    <property name="java.specification.version" value="25"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/test-classes:/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/classes:/home/siddeshwar/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/home/siddeshwar/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/siddeshwar/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/siddeshwar/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/siddeshwar/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:"/>
-    <property name="java.vm.vendor" value="Arch Linux"/>
+    <property name="java.class.path" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/test-classes:/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/classes:/Users/rutul/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/Users/rutul/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/Users/rutul/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/Users/rutul/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:"/>
+    <property name="java.vm.vendor" value="Homebrew"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="java.vendor.url" value="https://openjdk.java.net/"/>
+    <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues"/>
     <property name="user.timezone" value="Asia/Kolkata"/>
-    <property name="os.name" value="Linux"/>
-    <property name="java.vm.specification.version" value="17"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="java.vm.specification.version" value="25"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
-    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk/lib"/>
-    <property name="sun.java.command" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251124112558286_3.jar /home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/surefire 2025-11-24T11-25-58_210-jvmRun1 surefire-20251124112558286_1tmp surefire_0-20251124112558286_2tmp"/>
+    <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251125144029721_3.jar /Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/surefire 2025-11-25T14-40-29_681-jvmRun1 surefire-20251125144029721_1tmp surefire_0-20251125144029721_2tmp"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/test-classes:/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/classes:/home/siddeshwar/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/home/siddeshwar/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/home/siddeshwar/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/siddeshwar/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/home/siddeshwar/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/home/siddeshwar/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:"/>
+    <property name="surefire.test.class.path" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/test-classes:/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/classes:/Users/rutul/.m2/repository/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar:/Users/rutul/.m2/repository/com/google/protobuf/protobuf-java/3.25.1/protobuf-java-3.25.1.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter/5.9.3/junit-jupiter-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar:/Users/rutul/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-commons/1.9.3/junit-platform-commons-1.9.3.jar:/Users/rutul/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.9.3/junit-jupiter-params-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar:/Users/rutul/.m2/repository/org/junit/platform/junit-platform-engine/1.9.3/junit-platform-engine-1.9.3.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="user.home" value="/home/siddeshwar"/>
+    <property name="user.home" value="/Users/rutul"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
-    <property name="java.version.date" value="2025-07-15"/>
-    <property name="java.home" value="/usr/lib/jvm/java-17-openjdk"/>
+    <property name="java.version.date" value="2025-09-16"/>
+    <property name="java.home" value="/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home"/>
     <property name="file.separator" value="/"/>
-    <property name="basedir" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project"/>
+    <property name="basedir" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251124112558286_3.jar"/>
+    <property name="apple.awt.application.name" value="ForkedBooter"/>
+    <property name="surefire.real.class.path" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project/target/surefire/surefirebooter-20251125144029721_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="java.runtime.version" value="17.0.16+8"/>
-    <property name="user.name" value="siddeshwar"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.runtime.version" value="25"/>
+    <property name="user.name" value="rutul"/>
+    <property name="stdout.encoding" value="UTF-8"/>
     <property name="path.separator" value=":"/>
-    <property name="os.version" value="6.16.12-1-MANJARO"/>
+    <property name="os.version" value="26.1"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
-    <property name="localRepository" value="/home/siddeshwar/.m2/repository"/>
-    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
-    <property name="java.io.tmpdir" value="/tmp"/>
-    <property name="java.version" value="17.0.16"/>
-    <property name="user.dir" value="/home/siddeshwar/Desktop/School_Manager/imt2022021_JDBC_Project"/>
-    <property name="os.arch" value="amd64"/>
+    <property name="java.vendor.version" value="Homebrew"/>
+    <property name="localRepository" value="/Users/rutul/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
+    <property name="java.io.tmpdir" value="/var/folders/qw/2jnpzq9d3wsbnyjm3yppg7240000gn/T/"/>
+    <property name="java.version" value="25"/>
+    <property name="user.dir" value="/Users/rutul/Documents/School_Manager/imt2022021_JDBC_Project"/>
+    <property name="os.arch" value="aarch64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="native.encoding" value="UTF-8"/>
-    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.library.path" value="/Users/rutul/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
-    <property name="java.vendor" value="Arch Linux"/>
-    <property name="java.vm.version" value="17.0.16+8"/>
-    <property name="java.specification.maintenance.version" value="1"/>
-    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
-    <property name="java.class.version" value="61.0"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Homebrew"/>
+    <property name="java.vm.version" value="25"/>
+    <property name="stdin.encoding" value="UTF-8"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.class.version" value="69.0"/>
   </properties>
-  <testcase name="testUpdateCGPA_exception_noCrash" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.006"/>
+  <testcase name="testUpdateCGPA_exception_noCrash" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.007"/>
   <testcase name="testUpdateAddressAndPersisted" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.007"/>
-  <testcase name="testGetBooksForStudents_whenNoneAndWhenPresent" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.007"/>
+  <testcase name="testGetBooksForStudents_whenNoneAndWhenPresent" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.068"/>
   <testcase name="testDeleteNonExistingStudent_doesNotThrow" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.006"/>
-  <testcase name="testGetTopper_andEmptyCase" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.005"/>
-  <testcase name="testMapResultSetToList_emptyResultSet" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
-  <testcase name="testCreateReadDeleteStudent" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.004"/>
-  <testcase name="testUpdateAddress_nonExistingRollNumber_noEffect" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
-  <testcase name="testUpdateCGPA_changesValue" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.005"/>
-  <testcase name="testCreate_SQLExceptionHandled" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.011"/>
-  <testcase name="testAddAndRemoveStudentFromCourse_affectsDB" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.008"/>
-  <testcase name="testGetTopper_noStudents_returnsNull" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
-  <testcase name="testGetAllStudents_returnsNonEmptyList" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
+  <testcase name="testGetTopper_andEmptyCase" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
+  <testcase name="testMapResultSetToList_emptyResultSet" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.002"/>
+  <testcase name="testCreateReadDeleteStudent" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
+  <testcase name="testUpdateAddress_nonExistingRollNumber_noEffect" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.002"/>
+  <testcase name="testUpdateCGPA_changesValue" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.003"/>
+  <testcase name="testCreate_SQLExceptionHandled" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.004"/>
+  <testcase name="testAddAndRemoveStudentFromCourse_affectsDB" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.004"/>
+  <testcase name="testGetTopper_noStudents_returnsNull" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.002"/>
+  <testcase name="testGetAllStudents_returnsNonEmptyList" classname="com.schoolmanagement.tests.StudentDAOTest" time="0.002"/>
 </testsuite>

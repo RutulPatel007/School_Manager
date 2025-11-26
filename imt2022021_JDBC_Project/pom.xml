@@ -96,6 +96,8 @@
 
                     <targetClasses>
                         <param>com.schoolmanagement.dao.*</param>
+                        <!-- <param>com.schoolmanagement.models.*</param>
+                        <param>com.schoolmanagement.services.*</param> -->
                     </targetClasses>
 
                     <!-- Run ALL tests for maximum mutation coverage -->
